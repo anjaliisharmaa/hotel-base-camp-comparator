@@ -290,26 +290,75 @@ function calculateHotelStats(hotel, placesToEvaluate, budget) {
   };
 }
 
+
+
+// MASTER SORTING ALGO
 function rankHotels(hotelsToRank, placesToEvaluate, currentBudget) {
+
+  // metric calculation
+  /*
+  it iterates through raw hotel array
+  uses the spread operator (...) to merge the original hotel data (like id and name) 
+  with the computed statistics from calculateHotelStats
+
+  every hotel is calculated no matter the cost
+  */
   const evaluatedHotels = hotelsToRank.map((hotel) => ({
     ...hotel,
     ...calculateHotelStats(hotel, placesToEvaluate, currentBudget),
   }));
+
+  // sorting algo
+  /*
+  it isolates only the hotels that fit the budget
+  it sorts them using a chain of logical ORs (||)
+  */
   const affordableHotels = evaluatedHotels
     .filter((hotel) => hotel.is_affordable)
     .sort((hotelA, hotelB) => (
+      // primary sort
+      // sorts by the lowest travel time
       hotelA.weighted_travel_total - hotelB.weighted_travel_total
+
+      // tie breaker 1
+      // breaks the tie by choosing the cheaper hotel
       || hotelA.stay_cost - hotelB.stay_cost
+
+      // tie breaker 2
+      // checks the alphabetical order of the hotel IDs
+      // uses nested ternary operator (condition ? if_true : if_false)
       || (hotelA.id < hotelB.id ? -1 : hotelA.id > hotelB.id ? 1 : 0)
     ));
+
+  //  array for over budget hotels
   const overBudgetHotels = evaluatedHotels.filter((hotel) => !hotel.is_affordable);
+
+  // assigning ranks and recommendations
+  // loop through each hotel
   const rankedAffordableHotels = affordableHotels.map((hotel, index) => ({
-    ...hotel,
-    rank: index + 1,
-    is_recommended: index === 0,
-    is_over_budget: false,
-    budget_status: "Affordable",
+    ...hotel, // takes all the existing properties of that hotel
+    rank: index + 1, // clean ranking starting at 1
+    is_recommended: index === 0, // true for rank 1
+    is_over_budget: false, // all false as already filtered to be affordable
+    budget_status: "Affordable", // text label for ui
   }));
+  /*
+  this is created-----
+  {
+    id: "H_MARKET",
+    name: "Market Square Inn",
+    stay_cost: 30000,
+    x: 35, y: 52,
+    round_trip_minutes: { ... },
+    rank: 1,                          // <--- Added by .map()
+    is_recommended: true,             // <--- Added by .map()
+    is_over_budget: false,            // <--- Added by .map()
+    budget_status: "Affordable"       // <--- Added by .map()
+  }
+  */
+
+  // takes not affordable hotels
+  // strips them of a numerical rank
   const unrankedOverBudgetHotels = overBudgetHotels.map((hotel) => {
     const overBudgetBy = Math.abs(hotel.remaining_budget);
 
@@ -322,10 +371,13 @@ function rankHotels(hotelsToRank, placesToEvaluate, currentBudget) {
       budget_status: `Over budget by ${overBudgetBy}`,
     };
   });
+
+  // final array construction
+  // combines the two lists, ensuring affordable ranked hotels always appear above unranked over-budget hotels
   const results = [...rankedAffordableHotels, ...unrankedOverBudgetHotels];
 
   results.status = affordableHotels.length === 0
-    ? "NO_AFFORDABLE_HOTEL"
+    ? "NO_AFFORDABLE_HOTEL" // if affordable list is empty
     : "AFFORDABLE_HOTELS_FOUND";
   results.state = results.status;
   results.no_affordable_hotel = affordableHotels.length === 0;
