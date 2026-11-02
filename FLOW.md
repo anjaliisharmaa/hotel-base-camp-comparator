@@ -63,3 +63,22 @@ These values satisfy every calibration condition:
 - `H_MARKET` is affordable and has round-trip times above 90 minutes (its maximum is 119).
 
 All values are literal deterministic fixtures. No random number generation is used.
+
+## Step 2: The Calculation Engine
+
+1. Added `calculateContribution(hotel, place)` as a pure contribution function.
+   - **Reason:** It centralizes the required importance-times-round-trip calculation for every hotel/place pair.
+   - **File:** `app.js`
+2. Added `calculateHotelStats(hotel, places, budget)` as a pure statistics function.
+   - **Reason:** It derives the importance total, weighted travel total, remaining budget, affordability, and one-decimal weighted average from its inputs only.
+   - **Math:** The weighted average uses the required integer-only formula: `Math.floor((20 * weighted_travel_total + importance_total) / (2 * importance_total)) / 10`.
+   - **File:** `app.js`
+3. Added `rankHotels(hotels, places, currentBudget)` as a pure ranking function.
+   - **Reason:** It evaluates every hotel, sorts affordable results by weighted total, stay cost, and ASCII hotel ID, then appends unranked over-budget results.
+   - **Behavior:** Affordable results receive sequential ranks and only rank 1 is recommended. Over-budget results receive `budget_status: "Over budget by X"` and no numerical rank.
+   - **No-affordable state:** The returned array exposes `status` and `state` as `NO_AFFORDABLE_HOTEL`, plus `no_affordable_hotel: true`, when no hotel meets the budget.
+   - **File:** `app.js`
+4. Validated the calculation engine with deterministic normal, tie-break, and no-affordable scenarios.
+   - **Reason:** These checks verify the requested integer-only rounding, result partitioning, sequential ranks, recommendation flag, ASCII ID tie-break, over-budget shortfalls, and explicit empty-affordability state.
+   - **Result:** All checks passed with no failures. The calibrated `H_RIVERSIDE` result rounds to `63.9` minutes under the required one-decimal formula.
+   - **File:** `app.js`

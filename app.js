@@ -121,6 +121,75 @@ const hotels = [
   },
 ];
 
+function calculateContribution(hotel, place) {
+  return place.importance * hotel.round_trip_minutes[place.id];
+}
+
+function calculateHotelStats(hotel, placesToEvaluate, budget) {
+  const importanceTotal = placesToEvaluate.reduce(
+    (total, place) => total + place.importance,
+    0,
+  );
+  const weightedTravelTotal = placesToEvaluate.reduce(
+    (total, place) => total + calculateContribution(hotel, place),
+    0,
+  );
+  const roundedTenths = Math.floor(
+    (20 * weightedTravelTotal + importanceTotal) / (2 * importanceTotal),
+  );
+
+  return {
+    importance_total: importanceTotal,
+    weighted_travel_total: weightedTravelTotal,
+    remaining_budget: budget - hotel.stay_cost,
+    is_affordable: hotel.stay_cost <= budget,
+    weighted_average_minutes: roundedTenths / 10,
+  };
+}
+
+function rankHotels(hotelsToRank, placesToEvaluate, currentBudget) {
+  const evaluatedHotels = hotelsToRank.map((hotel) => ({
+    ...hotel,
+    ...calculateHotelStats(hotel, placesToEvaluate, currentBudget),
+  }));
+  const affordableHotels = evaluatedHotels
+    .filter((hotel) => hotel.is_affordable)
+    .sort((hotelA, hotelB) => (
+      hotelA.weighted_travel_total - hotelB.weighted_travel_total
+      || hotelA.stay_cost - hotelB.stay_cost
+      || (hotelA.id < hotelB.id ? -1 : hotelA.id > hotelB.id ? 1 : 0)
+    ));
+  const overBudgetHotels = evaluatedHotels.filter((hotel) => !hotel.is_affordable);
+  const rankedAffordableHotels = affordableHotels.map((hotel, index) => ({
+    ...hotel,
+    rank: index + 1,
+    is_recommended: index === 0,
+    is_over_budget: false,
+    budget_status: "Affordable",
+  }));
+  const unrankedOverBudgetHotels = overBudgetHotels.map((hotel) => {
+    const overBudgetBy = Math.abs(hotel.remaining_budget);
+
+    return {
+      ...hotel,
+      rank: null,
+      is_recommended: false,
+      is_over_budget: true,
+      over_budget_by: overBudgetBy,
+      budget_status: `Over budget by ${overBudgetBy}`,
+    };
+  });
+  const results = [...rankedAffordableHotels, ...unrankedOverBudgetHotels];
+
+  results.status = affordableHotels.length === 0
+    ? "NO_AFFORDABLE_HOTEL"
+    : "AFFORDABLE_HOTELS_FOUND";
+  results.state = results.status;
+  results.no_affordable_hotel = affordableHotels.length === 0;
+
+  return results;
+}
+
 const summary = document.querySelector("#data-summary");
 
 if (summary) {
