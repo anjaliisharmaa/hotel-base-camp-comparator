@@ -21,6 +21,7 @@ const places = [
 const ORIGINAL_IMPORTANCE_MAP = new Map(
   places.map((place) => [place.id, place.importance]),
 );
+let inspectionEnabled = false;
 
 const hotels = [
   {
@@ -405,6 +406,10 @@ function renderMapMarkers() {
     });
     label.textContent = hotel.name;
     marker.appendChild(label);
+    marker.addEventListener("click", () => {
+      inspectHotel(hotel.id);
+      focusHotelCard(hotel.id, true);
+    });
     markerLayer.appendChild(marker);
   });
 
@@ -433,8 +438,13 @@ function renderMapMarkers() {
 
 function clearMapInspection() {
   const map = document.querySelector("#city-map");
+  const results = document.querySelector("#hotel-results");
+  const details = document.querySelector("#calculation-details");
 
   if (!map) {
+    if (details) {
+      details.innerHTML = "";
+    }
     return;
   }
 
@@ -442,6 +452,74 @@ function clearMapInspection() {
   map.querySelectorAll(".map-marker.inspected").forEach((marker) => {
     marker.classList.remove("inspected");
   });
+  results?.querySelectorAll(".active-inspection").forEach((card) => {
+    card.classList.remove("active-inspection");
+  });
+  if (details) {
+    details.innerHTML = "";
+  }
+}
+
+function focusHotelCard(hotelId, shouldScroll = false) {
+  const results = document.querySelector("#hotel-results");
+  const card = results?.querySelector(`[data-hotel-id="${hotelId}"]`);
+
+  results?.querySelectorAll(".active-inspection").forEach((activeCard) => {
+    activeCard.classList.remove("active-inspection");
+  });
+  if (card) {
+    card.classList.add("active-inspection");
+    if (shouldScroll) {
+      card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+}
+
+function renderCalculationDetails(hotel) {
+  const details = document.querySelector("#calculation-details");
+
+  if (!details) {
+    return;
+  }
+
+  const stats = calculateHotelStats(hotel, places, DEFAULT_BUDGET);
+  const rows = places.map((place) => {
+    const travelMinutes = hotel.round_trip_minutes[place.id];
+    const contribution = calculateContribution(hotel, place);
+
+    return `
+      <tr>
+        <td>${escapeHTML(place.name)}</td>
+        <td>${place.importance}</td>
+        <td>${travelMinutes} minutes</td>
+        <td>${contribution}</td>
+      </tr>
+    `;
+  }).join("");
+
+  details.innerHTML = `
+    <h3 class="details-title">${escapeHTML(hotel.name)} by-place calculation</h3>
+    <div class="details-table-wrapper">
+      <table class="details-table">
+        <thead>
+          <tr>
+            <th scope="col">Place</th>
+            <th scope="col">Importance</th>
+            <th scope="col">Round-trip time</th>
+            <th scope="col">Weighted contribution</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <p class="formula">
+      <code>weighted_travel_total = ${places.map((place) => `${place.importance} × ${hotel.round_trip_minutes[place.id]}`).join(" + ")} = ${stats.weighted_travel_total}</code>
+    </p>
+    <p class="formula">
+      <code>rounded_tenths = floor((20 × ${stats.weighted_travel_total} + ${stats.importance_total}) / (2 × ${stats.importance_total})) = ${Math.round(stats.weighted_average_minutes * 10)}</code>;
+      <code>weighted_average_minutes = ${Math.round(stats.weighted_average_minutes * 10)} / 10 = ${stats.weighted_average_minutes.toFixed(1)}</code>
+    </p>
+  `;
 }
 
 function inspectHotel(hotelId) {
@@ -449,13 +527,14 @@ function inspectHotel(hotelId) {
   const hotel = hotels.find((candidate) => candidate.id === hotelId);
 
   clearMapInspection();
-  if (!map || !hotel) {
+  if (!inspectionEnabled || !map || !hotel) {
     return;
   }
 
   const comparisonLayer = createSvgElement("g", { class: "comparison-layer" });
   const hotelMarker = map.querySelector(`[data-hotel-id="${hotel.id}"]`);
   hotelMarker?.classList.add("inspected");
+  focusHotelCard(hotel.id);
 
   places.forEach((place) => {
     const line = createSvgElement("line", {
@@ -476,6 +555,7 @@ function inspectHotel(hotelId) {
   });
 
   map.insertBefore(comparisonLayer, map.querySelector(".marker-layer"));
+  renderCalculationDetails(hotel);
 }
 
 function renderHotelCard(hotel) {
@@ -545,6 +625,7 @@ function renderUI() {
   }
 
   if (rankingResult.status === "INVALID_SCENARIO") {
+    inspectionEnabled = false;
     clearMapInspection();
     errorBanner.hidden = false;
     errorBanner.textContent = rankingResult.error_message;
@@ -556,6 +637,7 @@ function renderUI() {
   errorBanner.textContent = "";
 
   if (rankingResult.status === "NO_AFFORDABLE_HOTEL") {
+    inspectionEnabled = false;
     clearMapInspection();
     results.innerHTML = `
       <div class="empty-results">
@@ -567,6 +649,7 @@ function renderUI() {
     return;
   }
 
+  inspectionEnabled = true;
   results.innerHTML = rankingResult.map(renderHotelCard).join("");
   inspectHotel(rankingResult[0].id);
 }
@@ -618,18 +701,21 @@ function attachUIListeners() {
       const card = event.target.closest("[data-hotel-id]");
       if (card) {
         inspectHotel(card.dataset.hotelId);
+        focusHotelCard(card.dataset.hotelId);
       }
     });
     results.addEventListener("mouseover", (event) => {
       const card = event.target.closest("[data-hotel-id]");
       if (card) {
         inspectHotel(card.dataset.hotelId);
+        focusHotelCard(card.dataset.hotelId);
       }
     });
     results.addEventListener("focusin", (event) => {
       const card = event.target.closest("[data-hotel-id]");
       if (card) {
         inspectHotel(card.dataset.hotelId);
+        focusHotelCard(card.dataset.hotelId);
       }
     });
   }

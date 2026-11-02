@@ -167,3 +167,23 @@ All values are literal deterministic fixtures. No random number generation is us
    - **Reason:** This confirms the default recommendation is `H_RIVERSIDE`, the 180000 budget promotes `H_CITADEL`, recalculation responds to importance changes, negative budgets produce the invalid clearing state, and restoring original importances returns `H_RIVERSIDE`.
    - **Result:** All checks passed with no failures.
    - **Files:** `index.html`, `style.css`, `app.js`
+
+## Step 7: Map Interactivity and Calculation Details
+
+1. Added an accessible calculation-details container below the schematic map.
+   - **Reason:** The inspected hotel needs a readable, non-geometric explanation of every place contribution and the final weighted result.
+   - **File:** `index.html`
+2. Added table and formula styles for the calculation-details panel.
+   - **Reason:** The 15-place breakdown must remain legible across desktop and narrow layouts while clearly separating inputs, contributions, totals, and rounding math.
+   - **File:** `style.css`
+3. Added click handling to every SVG hotel marker and active card synchronization.
+   - **Reason:** Map-to-list interaction is required in addition to the existing list-to-map interaction. Clicking a marker now inspects its hotel, scrolls the matching card into view, and applies `.active-inspection`.
+   - **File:** `app.js`
+4. Extended `inspectHotel(hotelId)` to render the full calculation explanation.
+   - **Reason:** Each inspected hotel now shows all 15 place names, importance values, stored round-trip minutes, and `calculateContribution` results, followed by the exact weighted-total and integer-rounded-average formulas.
+   - **Behavior:** Invalid and `NO_AFFORDABLE_HOTEL` states clear the calculation panel alongside map links and inspected markers.
+   - **File:** `app.js`
+5. Validated the calculation-details contract and synchronization code paths.
+   - **Reason:** This confirms the details view is generated for all 15 places, uses authoritative contribution math, and remains cleared for invalid or no-affordable states.
+   - **Result:** Syntax and integration checks passed with no failures. The calibrated `H_RIVERSIDE` breakdown totals `3449` and rounds to `63.9` minutes.
+   - **Files:** `index.html`, `style.css`, `app.js`
