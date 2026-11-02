@@ -190,6 +190,137 @@ function rankHotels(hotelsToRank, placesToEvaluate, currentBudget) {
   return results;
 }
 
+function validateScenario(hotelsToValidate, placesToValidate, currentBudget) {
+  const invalid = (errorMessage) => ({
+    is_valid: false,
+    error_message: errorMessage,
+  });
+
+  if (!Array.isArray(hotelsToValidate) || hotelsToValidate.length !== 10) {
+    return invalid("Scenario must contain exactly 10 hotels.");
+  }
+  if (!Array.isArray(placesToValidate) || placesToValidate.length !== 15) {
+    return invalid("Scenario must contain exactly 15 places.");
+  }
+
+  const idPattern = /^[A-Z][A-Z0-9_-]{0,15}$/;
+  const placeIds = new Set();
+  for (const place of placesToValidate) {
+    if (typeof place.id !== "string" || !idPattern.test(place.id)) {
+      return invalid(`Place ID "${place.id ?? ""}" must match the required format.`);
+    }
+    if (placeIds.has(place.id)) {
+      return invalid(`Place ID "${place.id}" is duplicated.`);
+    }
+    placeIds.add(place.id);
+  }
+
+  const hotelIds = new Set();
+  for (const hotel of hotelsToValidate) {
+    if (typeof hotel.id !== "string" || !idPattern.test(hotel.id)) {
+      return invalid(`Hotel ID "${hotel.id ?? ""}" must match the required format.`);
+    }
+    if (hotelIds.has(hotel.id)) {
+      return invalid(`Hotel ID "${hotel.id}" is duplicated.`);
+    }
+    hotelIds.add(hotel.id);
+  }
+
+  for (const place of placesToValidate) {
+    if (typeof place.name !== "string" || place.name.replace(/\s/g, "").length === 0) {
+      return invalid(`Place "${place.id}" must have a non-empty name.`);
+    }
+  }
+  for (const hotel of hotelsToValidate) {
+    if (typeof hotel.name !== "string" || hotel.name.replace(/\s/g, "").length === 0) {
+      return invalid(`Hotel "${hotel.id}" must have a non-empty name.`);
+    }
+  }
+
+  const supportedTypes = new Set(["attraction", "food"]);
+  const typeCounts = { attraction: 0, food: 0 };
+  for (const place of placesToValidate) {
+    if (!supportedTypes.has(place.type)) {
+      return invalid(`Place "${place.id}" has unsupported type "${place.type}".`);
+    }
+    typeCounts[place.type] += 1;
+  }
+  if (typeCounts.attraction < 3 || typeCounts.food < 3) {
+    return invalid("Scenario must contain at least 3 attractions and 3 food places.");
+  }
+
+  const importanceValues = new Set();
+  for (const place of placesToValidate) {
+    if (!Number.isInteger(place.importance) || place.importance < 1 || place.importance > 5) {
+      return invalid(`Place "${place.id}" importance must be a whole number from 1 to 5.`);
+    }
+    importanceValues.add(place.importance);
+  }
+  if (importanceValues.size < 3) {
+    return invalid("Scenario must contain at least 3 distinct place importance values.");
+  }
+
+  if (!Number.isInteger(currentBudget) || currentBudget < 0 || currentBudget > 1000000) {
+    return invalid("Current budget must be a whole number from 0 to 1000000.");
+  }
+
+  for (const hotel of hotelsToValidate) {
+    if (!Number.isInteger(hotel.stay_cost) || hotel.stay_cost < 1 || hotel.stay_cost > 1000000) {
+      return invalid(`Hotel "${hotel.id}" stay cost must be a whole number from 1 to 1000000.`);
+    }
+    if (
+      hotel.round_trip_minutes === null
+      || typeof hotel.round_trip_minutes !== "object"
+      || Array.isArray(hotel.round_trip_minutes)
+    ) {
+      return invalid(`Hotel "${hotel.id}" must provide a round-trip mapping.`);
+    }
+
+    const travelPlaceIds = Object.keys(hotel.round_trip_minutes);
+    if (travelPlaceIds.length !== 15) {
+      return invalid(`Hotel "${hotel.id}" must map exactly 15 place IDs.`);
+    }
+    for (const placeId of travelPlaceIds) {
+      if (!placeIds.has(placeId)) {
+        return invalid(`Hotel "${hotel.id}" maps unknown place ID "${placeId}".`);
+      }
+      const travelMinutes = hotel.round_trip_minutes[placeId];
+      if (
+        !Number.isInteger(travelMinutes)
+        || travelMinutes < 1
+        || travelMinutes > 600
+      ) {
+        return invalid(`Hotel "${hotel.id}" travel time for "${placeId}" must be a whole number from 1 to 600.`);
+      }
+    }
+  }
+
+  return {
+    is_valid: true,
+    error_message: null,
+  };
+}
+
+function processRankingRequest(hotelsToProcess, placesToProcess, currentBudget) {
+  const validation = validateScenario(hotelsToProcess, placesToProcess, currentBudget);
+
+  if (!validation.is_valid) {
+    return {
+      status: "INVALID_SCENARIO",
+      error_message: validation.error_message,
+      clear_stale_state: true,
+      clear_instructions: [
+        "Clear all hotel ranks.",
+        "Clear the recommended hotel.",
+        "Clear all place contribution values.",
+        "Clear all map highlights.",
+      ],
+    };
+  }
+
+  return rankHotels(hotelsToProcess, placesToProcess, currentBudget);
+}
+
 const summary = document.querySelector("#data-summary");
 
 if (summary) {

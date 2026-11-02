@@ -82,3 +82,23 @@ All values are literal deterministic fixtures. No random number generation is us
    - **Reason:** These checks verify the requested integer-only rounding, result partitioning, sequential ranks, recommendation flag, ASCII ID tie-break, over-budget shortfalls, and explicit empty-affordability state.
    - **Result:** All checks passed with no failures. The calibrated `H_RIVERSIDE` result rounds to `63.9` minutes under the required one-decimal formula.
    - **File:** `app.js`
+
+## Step 3: State Validation and Error Handling
+
+1. Added `validateScenario(hotels, places, currentBudget)` as a pure pre-ranking validation layer.
+   - **Reason:** Ranking must never run against malformed or incomplete state.
+   - **Rules:** It checks the exact 10-hotel and 15-place counts; duplicate IDs; the `^[A-Z][A-Z0-9_-]{0,15}$` ID format; non-empty names after whitespace removal; supported place types and minimum counts; at least three distinct importance values with every value from 1 through 5; a budget from 0 through 1,000,000; hotel stay costs from 1 through 1,000,000; and exactly 15 known place keys with travel times from 1 through 600 for every hotel.
+   - **Result shape:** It returns `{ is_valid: boolean, error_message: string | null }` and stops at the first specific validation failure.
+   - **File:** `app.js`
+2. Added `processRankingRequest(hotels, places, currentBudget)` as the ranking boundary.
+   - **Reason:** Invalid state must produce no partial ranking and must tell the UI to clear all stale derived state.
+   - **Invalid result:** Returns an explicit `INVALID_SCENARIO` error state containing the validation message and `clear_stale_state: true` with clear instructions for ranks, recommendations, contributions, and map highlights.
+   - **Valid result:** Delegates unchanged to `rankHotels` after validation succeeds.
+   - **File:** `app.js`
+3. Validation behavior will be tested against the valid fixture and representative failures for counts, IDs, names, types, importance, budget, stay cost, and travel mappings.
+   - **Reason:** Each required rule needs evidence that malformed state is rejected before ranking.
+   - **File:** `app.js`
+4. Executed validation tests covering the valid scenario, every required malformed-state category, invalid request clearing, and a valid no-affordable budget.
+   - **Reason:** This confirms invalid data cannot produce a partial ranking and that all stale derived UI state is explicitly marked for clearing.
+   - **Result:** All checks passed with no failures.
+   - **File:** `app.js`
