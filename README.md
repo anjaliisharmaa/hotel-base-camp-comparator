@@ -25,11 +25,18 @@ The application successfully demonstrates the required boundaries (e.g., dynamic
 
 **Main Workspace & Schematic Map:**
 *(The SVG map accurately clusters markers without relying on pixel distance for calculations)*
-![Main Workspace](images/home_page_1.png)
+![Main Workspace 1](images/home_page_1.png)
+![Main Workspace 2](images/home_page_2.png)
+![Main Workspace 3](images/home_page_3.png)
 
 **Accessible Calculation Details:**
 *(Two-way synchronization allows users to click a hotel and view the exact integer-rounding formula and weighted contribution breakdown)*
-![Calculation Details](./Screenshot%202026-11-03%20012757.png)
+![Calculation Details 1](images/map_error.png)
+![Calculation Details 2](images/map_fixed.png)
+
+**Edge-Case & Tie-Breaker Proof:**
+*(The dependency-injection scenario proves budget equality, over-budget exclusion by exactly 1 unit, stay-cost tie-breaking, and ASCII ID tie-breaking)*
+![Tie-Breaker Evidence](images/tie_breaker.png)
 
 ### Live Demo
-[Insert Your GitHub Pages / Vercel Link Here]
+[Click to view](https://anjaliisharmaa.github.io/hotel-base-camp-comparator/)
