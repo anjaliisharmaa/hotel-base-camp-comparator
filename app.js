@@ -2,6 +2,7 @@
 const DEFAULT_BUDGET = 100000;
 
 
+
 // a list (array) of javascript objects
 // defined 15 places -> 9 attractions and 6 food spots
 /*
@@ -32,6 +33,7 @@ const places = [
 ];
 
 
+
 // a map to ensure we have the of values saved
 // maps every place is to its importance score
 // example : P_MUSEUM -> 5
@@ -40,9 +42,11 @@ const ORIGINAL_IMPORTANCE_MAP = new Map(
 );
 
 
+
 // for invalid budget like '-50', it throws validation error
 // if user ignores the error and clicks on any hotel dot, this guards the backend calculation
 let inspectionEnabled = false;
+
 
 
 // array for hotels
@@ -166,16 +170,31 @@ const hotels = [
   },
 ];
 
-let activePlaces = places;
-let activeHotels = hotels;
-let activeScenarioOptions = {};
 
+
+// load tie-breaker scenario
+// act as state switch
+// all core functions are written to read from these
+// for tie breaker visualisation, we reassign active places to EDGE_CASE_PLACES
+// and active hotels to EDGE_CASE_HOTELS
+let activePlaces = places; // by default main places
+let activeHotels = hotels; // by default main hotels
+let activeScenarioOptions = {}; // initialize empty objects to store settings
+
+
+
+// EDGE CASE DATASET--------
+// budget = 100
+
+// a dummy ddestination with importance of 1
 const EDGE_CASE_PLACES = [
   { id: "P_TEST", name: "Tie-Breaker Test Place", type: "attraction", importance: 1, x: 50, y: 50 },
 ];
 
+// dummy hotels
 const EDGE_CASE_HOTELS = [
   {
+    // RULE : affordability is strictly <= budget
     id: "H_EXACT_BUDGET",
     name: "Exact Budget Hotel",
     stay_cost: 100,
@@ -184,6 +203,7 @@ const EDGE_CASE_HOTELS = [
     round_trip_minutes: { P_TEST: 50 },
   },
   {
+    // best travel time but over budget
     id: "H_OVER_BUDGET",
     name: "One Unit Over Hotel",
     stay_cost: 101,
@@ -192,6 +212,10 @@ const EDGE_CASE_HOTELS = [
     round_trip_minutes: { P_TEST: 10 },
   },
   {
+    // RULE : cost tie breaker
+    // round trip time = 80
+    // cost = 50 < 60
+    // winner
     id: "H_TIE_WINNER",
     name: "Tie Winner Hotel",
     stay_cost: 50,
@@ -200,6 +224,10 @@ const EDGE_CASE_HOTELS = [
     round_trip_minutes: { P_TEST: 80 },
   },
   {
+    // RULE : cost tie breaker
+    // round trip time = 80
+    // cost = 60 > 50
+    // loser
     id: "H_TIE_LOSER",
     name: "Tie Cost Loser Hotel",
     stay_cost: 60,
@@ -208,6 +236,8 @@ const EDGE_CASE_HOTELS = [
     round_trip_minutes: { P_TEST: 80 },
   },
   {
+    // RULE : ASCII ID tie breaker
+    // identical hotels : this and h_tie_winner
     id: "H_Z_ASCII_LOSER",
     name: "ASCII Tie Loser Hotel",
     stay_cost: 50,
