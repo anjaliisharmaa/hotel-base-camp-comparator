@@ -321,16 +321,146 @@ function processRankingRequest(hotelsToProcess, placesToProcess, currentBudget) 
   return rankHotels(hotelsToProcess, placesToProcess, currentBudget);
 }
 
-const summary = document.querySelector("#data-summary");
+function escapeHTML(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
-if (summary) {
-  const attractionCount = places.filter((place) => place.type === "attraction").length;
-  const foodCount = places.filter((place) => place.type === "food").length;
-  const affordableCount = hotels.filter((hotel) => hotel.stay_cost <= DEFAULT_BUDGET).length;
+function renderImportanceControls() {
+  const controls = document.querySelector("#importance-controls");
 
-  summary.innerHTML = `
-    <div class="summary-card"><strong>${places.length}</strong><span>places (${attractionCount} attractions, ${foodCount} food)</span></div>
-    <div class="summary-card"><strong>${hotels.length}</strong><span>deterministic hotels</span></div>
-    <div class="summary-card"><strong>${affordableCount}</strong><span>hotels within the ${DEFAULT_BUDGET.toLocaleString()} budget</span></div>
+  if (!controls) {
+    return;
+  }
+
+  controls.innerHTML = places.map((place) => `
+    <div class="importance-control">
+      <label for="importance-${escapeHTML(place.id)}">${escapeHTML(place.name)}</label>
+      <output id="importance-value-${escapeHTML(place.id)}" for="importance-${escapeHTML(place.id)}">${place.importance}</output>
+      <input
+        id="importance-${escapeHTML(place.id)}"
+        data-place-id="${escapeHTML(place.id)}"
+        type="range"
+        min="1"
+        max="5"
+        step="1"
+        value="${place.importance}"
+        aria-label="Importance of ${escapeHTML(place.name)}"
+      />
+    </div>
+  `).join("");
+}
+
+function renderHotelCard(hotel) {
+  const isOverBudget = hotel.is_over_budget;
+  const cardClass = isOverBudget
+    ? "hotel-card over-budget"
+    : `hotel-card${hotel.is_recommended ? " recommended" : ""}`;
+  const headingLabel = isOverBudget
+    ? `<span class="over-budget-label">${escapeHTML(hotel.budget_status)}</span>`
+    : `<span class="rank-label">Rank ${hotel.rank}</span>`;
+  const recommendationLabel = hotel.is_recommended
+    ? '<span class="recommendation-label">Recommended</span>'
+    : "";
+  const detail = isOverBudget
+    ? `<div><span class="over-budget-label">${escapeHTML(hotel.budget_status)}</span></div>`
+    : `
+      <div>Stay cost<strong>$${hotel.stay_cost.toLocaleString()}</strong></div>
+      <div>Weighted average<strong>${hotel.weighted_average_minutes.toFixed(1)} minutes</strong></div>
+    `;
+
+  return `
+    <article class="${cardClass}">
+      <div class="hotel-card-header">
+        <div>
+          ${headingLabel}
+          <h3>${escapeHTML(hotel.name)}</h3>
+        </div>
+        ${recommendationLabel}
+      </div>
+      <div class="hotel-details">
+        ${detail}
+      </div>
+    </article>
   `;
+}
+
+function renderUI() {
+  const budgetInput = document.querySelector("#budget-input");
+  const controls = document.querySelectorAll("[data-place-id]");
+  const errorBanner = document.querySelector("#error-banner");
+  const results = document.querySelector("#hotel-results");
+  const summary = document.querySelector("#data-summary");
+
+  if (!budgetInput || !errorBanner || !results) {
+    return;
+  }
+
+  controls.forEach((control) => {
+    const place = places.find((candidate) => candidate.id === control.dataset.placeId);
+    const value = Number(control.value);
+
+    if (place && Number.isInteger(value)) {
+      place.importance = value;
+      const output = document.querySelector(`#importance-value-${place.id}`);
+      if (output) {
+        output.value = String(value);
+        output.textContent = String(value);
+      }
+    }
+  });
+
+  const currentBudget = Number(budgetInput.value);
+  const rankingResult = processRankingRequest(hotels, places, currentBudget);
+
+  if (summary) {
+    summary.textContent = `${places.length} places · ${hotels.length} hotels`;
+  }
+
+  if (rankingResult.status === "INVALID_SCENARIO") {
+    errorBanner.hidden = false;
+    errorBanner.textContent = rankingResult.error_message;
+    results.innerHTML = "";
+    return;
+  }
+
+  errorBanner.hidden = true;
+  errorBanner.textContent = "";
+
+  if (rankingResult.status === "NO_AFFORDABLE_HOTEL") {
+    results.innerHTML = `
+      <div class="empty-results">
+        <strong>NO AFFORDABLE HOTELS</strong>
+        No hotels meet the current budget. The over-budget options are listed below.
+      </div>
+      ${rankingResult.map(renderHotelCard).join("")}
+    `;
+    return;
+  }
+
+  results.innerHTML = rankingResult.map(renderHotelCard).join("");
+}
+
+function attachUIListeners() {
+  const budgetInput = document.querySelector("#budget-input");
+  const controls = document.querySelectorAll("[data-place-id]");
+
+  if (budgetInput) {
+    budgetInput.addEventListener("input", renderUI);
+  }
+  controls.forEach((control) => {
+    control.addEventListener("input", renderUI);
+  });
+}
+
+const budgetInput = document.querySelector("#budget-input");
+if (budgetInput) {
+  budgetInput.value = String(DEFAULT_BUDGET);
+  renderImportanceControls();
+  attachUIListeners();
+  renderUI();
 }

@@ -102,3 +102,26 @@ All values are literal deterministic fixtures. No random number generation is us
    - **Reason:** This confirms invalid data cannot produce a partial ranking and that all stale derived UI state is explicitly marked for clearing.
    - **Result:** All checks passed with no failures.
    - **File:** `app.js`
+
+## Step 4: Base User Interface
+
+1. Replaced the initialization-only page with a sidebar controls area and a main hotel-results area.
+   - **Reason:** The interface needs separate, responsive surfaces for scenario inputs and calculated rankings while reserving the visual map for Step 5.
+   - **File:** `index.html`
+2. Added a budget number input, a dynamically populated importance-control container, a hidden validation banner, and a hotel-card results container.
+   - **Reason:** The DOM provides stable targets for the calculation engine without hardcoding 15 repeated controls in HTML.
+   - **File:** `index.html`
+3. Added layout, control, result-card, recommended-card, over-budget, error, and responsive styles.
+   - **Reason:** Affordable, recommended, over-budget, invalid, and no-affordable states must be visually distinguishable and usable on narrow screens.
+   - **File:** `style.css`
+4. Added `renderImportanceControls()` and `renderUI()` DOM binding logic.
+   - **Reason:** Controls are generated from the deterministic `places` data, current importance values are read back into the original place objects, and all ranking output is derived through `processRankingRequest`.
+   - **Behavior:** Invalid requests hide no stale results by accident: the error banner shows the exact validation message and results are cleared. Valid no-affordable requests show a clear message followed by over-budget cards. Valid requests render every hotel with ranks or explicit shortfalls.
+   - **File:** `app.js`
+5. Added input listeners for budget and generated importance sliders, then invoked `renderUI()` on initial load.
+   - **Reason:** Results update immediately after any scenario change and are populated on first page load.
+   - **File:** `app.js`
+6. Ran UI integration checks with lightweight DOM stubs and engine regression checks.
+   - **Reason:** This verifies the fixture still validates, the recommended and over-budget card markup is produced, invalid requests retain the clearing contract, and the ranking engine still recommends `H_RIVERSIDE` at `63.9` minutes.
+   - **Result:** All checks passed with no failures.
+   - **Files:** `index.html`, `style.css`, `app.js`

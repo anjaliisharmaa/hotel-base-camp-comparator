@@ -12,10 +12,15 @@ body {
   margin: 0;
 }
 
-.container {
-  max-width: 760px;
+.app-shell {
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 5rem 1.5rem;
+  padding: 3.5rem 2rem;
+}
+
+.page-header {
+  max-width: 720px;
+  margin-bottom: 2.5rem;
 }
 
 .eyebrow {
@@ -34,6 +39,20 @@ h1 {
   line-height: 1.05;
 }
 
+h2,
+h3 {
+  margin: 0;
+  color: #101828;
+}
+
+h2 {
+  font-size: 1.35rem;
+}
+
+h3 {
+  font-size: 1rem;
+}
+
 .intro {
   max-width: 52ch;
   color: #475467;
@@ -41,29 +60,230 @@ h1 {
   line-height: 1.6;
 }
 
-.summary {
+.workspace {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-top: 2rem;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
 }
 
-.summary-card {
-  padding: 1.25rem;
+.sidebar,
+.results-panel {
   border: 1px solid #d0d5dd;
-  border-radius: 0.75rem;
+  border-radius: 1rem;
   background: #fff;
   box-shadow: 0 0.5rem 1.5rem rgb(16 24 40 / 8%);
 }
 
-.summary-card strong {
+.sidebar {
+  padding: 1.5rem;
+}
+
+.budget-control,
+.importance-control {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.budget-control {
+  margin-top: 1.5rem;
+  color: #344054;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.input-with-prefix {
+  display: flex;
+  align-items: center;
+  border: 1px solid #98a2b3;
+  border-radius: 0.5rem;
+  color: #667085;
+  font-weight: 400;
+  overflow: hidden;
+}
+
+.input-with-prefix span {
+  padding-left: 0.75rem;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 0.7rem;
+  border: 0;
+  color: #101828;
+  font: inherit;
+}
+
+input:focus-visible {
+  outline: 3px solid rgb(82 99 206 / 25%);
+  outline-offset: 2px;
+}
+
+.places-controls {
+  margin-top: 2rem;
+}
+
+.section-heading p {
+  margin: 0.4rem 0 1.25rem;
+  color: #667085;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+#importance-controls {
+  display: grid;
+  gap: 1rem;
+}
+
+.importance-control {
+  grid-template-columns: minmax(0, 1fr) 2rem;
+  align-items: center;
+}
+
+.importance-control label {
+  color: #344054;
+  font-size: 0.82rem;
+}
+
+.importance-control output {
+  color: #5263ce;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+input[type="range"] {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: #5263ce;
+}
+
+.results-panel {
+  min-width: 0;
+  padding: 1.5rem;
+}
+
+.results-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.results-heading .eyebrow {
+  margin-bottom: 0.35rem;
+}
+
+.summary {
+  margin: 0;
+  color: #667085;
+  font-size: 0.85rem;
+}
+
+.error-banner {
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border: 1px solid #f04438;
+  border-radius: 0.6rem;
+  background: #fef3f2;
+  color: #b42318;
+  line-height: 1.5;
+}
+
+.hotel-results {
+  display: grid;
+  gap: 1rem;
+}
+
+.hotel-card {
+  padding: 1.25rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.hotel-card.recommended {
+  border: 2px solid #d6a72c;
+  background: #fffcf0;
+}
+
+.hotel-card.over-budget {
+  border-color: #d0d5dd;
+  background: #f2f4f7;
+  color: #667085;
+}
+
+.hotel-card-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hotel-card h3 {
+  font-size: 1.1rem;
+}
+
+.rank-label,
+.recommendation-label,
+.over-budget-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.rank-label {
+  color: #5263ce;
+}
+
+.recommendation-label {
+  color: #9a6700;
+}
+
+.over-budget-label {
+  color: #b42318;
+}
+
+.hotel-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin: 1rem 0 0;
+  color: #475467;
+  font-size: 0.9rem;
+}
+
+.hotel-details strong {
+  display: block;
+  margin-top: 0.25rem;
+  color: #101828;
+  font-size: 1rem;
+}
+
+.empty-results {
+  padding: 1.25rem;
+  border: 1px dashed #98a2b3;
+  border-radius: 0.75rem;
+  color: #475467;
+}
+
+.empty-results strong {
   display: block;
   margin-bottom: 0.35rem;
   color: #101828;
-  font-size: 1.5rem;
 }
 
-.summary-card span {
-  color: #667085;
-  font-size: 0.9rem;
+@media (max-width: 800px) {
+  .app-shell {
+    padding: 2rem 1rem;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .results-heading {
+    align-items: start;
+    flex-direction: column;
+  }
 }
