@@ -25,7 +25,7 @@ The application successfully demonstrates the required boundaries (e.g., dynamic
 
 **Main Workspace & Schematic Map:**
 *(The SVG map accurately clusters markers without relying on pixel distance for calculations)*
-![Main Workspace](.images/home_page_1.png)
+![Main Workspace](images/home_page_1.png)
 
 **Accessible Calculation Details:**
 *(Two-way synchronization allows users to click a hotel and view the exact integer-rounding formula and weighted contribution breakdown)*
