@@ -18,6 +18,10 @@ const places = [
   { id: "P_FESTIVAL", name: "Riverside Festival Grounds", type: "attraction", importance: 5, x: 90, y: 74 },
 ];
 
+const ORIGINAL_IMPORTANCE_MAP = new Map(
+  places.map((place) => [place.id, place.importance]),
+);
+
 const hotels = [
   {
     id: "H_CITADEL",
@@ -567,9 +571,38 @@ function renderUI() {
   inspectHotel(rankingResult[0].id);
 }
 
+function resetScenario() {
+  const budgetInput = document.querySelector("#budget-input");
+
+  if (budgetInput) {
+    budgetInput.value = String(DEFAULT_BUDGET);
+  }
+
+  places.forEach((place) => {
+    const originalImportance = ORIGINAL_IMPORTANCE_MAP.get(place.id);
+    if (originalImportance === undefined) {
+      return;
+    }
+
+    place.importance = originalImportance;
+    const control = document.querySelector(`#importance-${place.id}`);
+    const output = document.querySelector(`#importance-value-${place.id}`);
+    if (control) {
+      control.value = String(originalImportance);
+    }
+    if (output) {
+      output.value = String(originalImportance);
+      output.textContent = String(originalImportance);
+    }
+  });
+
+  renderUI();
+}
+
 function attachUIListeners() {
   const budgetInput = document.querySelector("#budget-input");
   const controls = document.querySelectorAll("[data-place-id]");
+  const resetButton = document.querySelector("#reset-btn");
 
   if (budgetInput) {
     budgetInput.addEventListener("input", renderUI);
@@ -577,6 +610,7 @@ function attachUIListeners() {
   controls.forEach((control) => {
     control.addEventListener("input", renderUI);
   });
+  resetButton?.addEventListener("click", resetScenario);
 
   const results = document.querySelector("#hotel-results");
   if (results) {

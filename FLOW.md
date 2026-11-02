@@ -148,3 +148,22 @@ All values are literal deterministic fixtures. No random number generation is us
    - **Reason:** This confirms all 25 coordinates are within the 0-100 SVG viewBox, the scenario remains valid, the recommendation remains `H_RIVERSIDE`, and cards expose hotel IDs for inspection.
    - **Result:** All checks passed with no failures.
    - **Files:** `index.html`, `style.css`, `app.js`
+
+## Step 6: Reset Functionality and Final Polish
+
+1. Added `ORIGINAL_IMPORTANCE_MAP` immediately after deterministic place initialization.
+   - **Reason:** The reset operation needs an immutable source of the original importance values without reloading the page or reconstructing data.
+   - **File:** `app.js`
+2. Added a `Reset Trip` sidebar button and secondary-action styling.
+   - **Reason:** Users need an obvious way to recover from what-if budget and importance changes while keeping reset visually distinct from editable controls.
+   - **Files:** `index.html`, `style.css`
+3. Added `resetScenario()` and connected it to the reset button.
+   - **Reason:** Reset restores `DEFAULT_BUDGET`, restores every place importance from the original map, synchronizes all slider values and outputs, and calls `renderUI()` so rankings and the recommended map inspection update without a page reload.
+   - **File:** `app.js`
+4. Final validation will cover the default recommendation, the 180000 budget boundary, importance mutations, negative-budget error clearing, and reset restoration.
+   - **Reason:** These are the required what-if behaviors and confirm reset preserves the deterministic baseline.
+   - **Files:** `index.html`, `style.css`, `app.js`
+5. Ran the final what-if validation scenarios.
+   - **Reason:** This confirms the default recommendation is `H_RIVERSIDE`, the 180000 budget promotes `H_CITADEL`, recalculation responds to importance changes, negative budgets produce the invalid clearing state, and restoring original importances returns `H_RIVERSIDE`.
+   - **Result:** All checks passed with no failures.
+   - **Files:** `index.html`, `style.css`, `app.js`
