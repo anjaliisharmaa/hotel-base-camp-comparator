@@ -187,3 +187,27 @@ All values are literal deterministic fixtures. No random number generation is us
    - **Reason:** This confirms the details view is generated for all 15 places, uses authoritative contribution math, and remains cleared for invalid or no-affordable states.
    - **Result:** Syntax and integration checks passed with no failures. The calibrated `H_RIVERSIDE` breakdown totals `3449` and rounds to `63.9` minutes.
    - **Files:** `index.html`, `style.css`, `app.js`
+
+## Step 8: Edge Case Demonstrations and Budget Timeline
+
+1. Added an explicit `Load Tie-Breaker Scenario` control and a small edge fixture.
+   - **Reason:** Interviewers can visually verify budget equality, over-budget exclusion, stay-cost tie-breaking, and ASCII ID tie-breaking without altering the primary 10-hotel/15-place dataset.
+   - **Fixture:** One `P_TEST` place and five listed hotels (`H_EXACT_BUDGET`, `H_OVER_BUDGET`, `H_TIE_WINNER`, `H_TIE_LOSER`, and `H_Z_ASCII_LOSER`). The prompt says four hotels but lists five; all five are included so both tie cases are demonstrable.
+   - **File:** `app.js`
+2. Added an explicit edge-scenario validation mode to `processRankingRequest`.
+   - **Reason:** The normal validator must continue requiring exactly 10 hotels and 15 places, while the deliberately tiny demonstration must still be processed through the same ranking boundary rather than bypassing validation.
+   - **File:** `app.js`
+3. Added `generateTimeline()` and a recommendation timeline below the controls.
+   - **Reason:** The timeline programmatically evaluates the active scenario at budget thresholds from zero through the most expensive stay cost and groups contiguous ranges whenever the recommended hotel or no-affordable state changes.
+   - **Behavior:** It uses current place importance values, so slider changes regenerate recommendation boundaries; it does not hardcode hotel names or thresholds.
+   - **Files:** `index.html`, `app.js`, `style.css`
+4. Added active-scenario state switching and reset restoration.
+   - **Reason:** The edge fixture must render through the same map, cards, details, validation, and timeline paths, while `Reset Trip` must restore the original deterministic dataset.
+   - **Files:** `app.js`
+5. Validation will cover the edge equality and tie order, normal-dataset preservation, timeline boundaries, and reset return to the baseline.
+   - **Reason:** These checks prove the demonstration is mathematically driven and does not compromise the main scenario.
+   - **Files:** `app.js`
+6. Ran edge-case and timeline validation.
+   - **Reason:** This confirms `H_EXACT_BUDGET` is affordable at equality, `H_OVER_BUDGET` is unranked by exactly 1, the affordable order is `H_EXACT_BUDGET`, `H_TIE_WINNER`, `H_Z_ASCII_LOSER`, `H_TIE_LOSER`, the normal recommendation remains `H_RIVERSIDE`, and the baseline timeline changes at 30000, 60000, and 180000.
+   - **Result:** Syntax and behavior checks passed with no failures.
+   - **Files:** `index.html`, `style.css`, `app.js`

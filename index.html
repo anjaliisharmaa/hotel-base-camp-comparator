@@ -27,6 +27,7 @@
             </span>
           </label>
           <button id="reset-btn" class="reset-button" type="button">Reset Trip</button>
+          <button id="edge-case-btn" class="edge-case-button" type="button">Load Tie-Breaker Scenario</button>
           <div class="places-controls">
             <div class="section-heading">
               <h3>Place importance</h3>
@@ -34,6 +35,10 @@
             </div>
             <div id="importance-controls"></div>
           </div>
+          <section class="timeline-panel" aria-labelledby="timeline-title">
+            <h3 id="timeline-title">Recommendation Timeline</h3>
+            <div id="recommendation-timeline" aria-live="polite"></div>
+          </section>
         </aside>
         <section class="map-panel" aria-labelledby="map-title">
           <div class="results-heading">

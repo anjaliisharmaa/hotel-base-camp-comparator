@@ -136,6 +136,57 @@ const hotels = [
   },
 ];
 
+let activePlaces = places;
+let activeHotels = hotels;
+let activeScenarioOptions = {};
+
+const EDGE_CASE_PLACES = [
+  { id: "P_TEST", name: "Tie-Breaker Test Place", type: "attraction", importance: 1, x: 50, y: 50 },
+];
+
+const EDGE_CASE_HOTELS = [
+  {
+    id: "H_EXACT_BUDGET",
+    name: "Exact Budget Hotel",
+    stay_cost: 100,
+    x: 30,
+    y: 35,
+    round_trip_minutes: { P_TEST: 50 },
+  },
+  {
+    id: "H_OVER_BUDGET",
+    name: "One Unit Over Hotel",
+    stay_cost: 101,
+    x: 70,
+    y: 35,
+    round_trip_minutes: { P_TEST: 10 },
+  },
+  {
+    id: "H_TIE_WINNER",
+    name: "Tie Winner Hotel",
+    stay_cost: 50,
+    x: 35,
+    y: 70,
+    round_trip_minutes: { P_TEST: 80 },
+  },
+  {
+    id: "H_TIE_LOSER",
+    name: "Tie Cost Loser Hotel",
+    stay_cost: 60,
+    x: 65,
+    y: 70,
+    round_trip_minutes: { P_TEST: 80 },
+  },
+  {
+    id: "H_Z_ASCII_LOSER",
+    name: "ASCII Tie Loser Hotel",
+    stay_cost: 50,
+    x: 50,
+    y: 20,
+    round_trip_minutes: { P_TEST: 80 },
+  },
+];
+
 function calculateContribution(hotel, place) {
   return place.importance * hotel.round_trip_minutes[place.id];
 }
@@ -205,16 +256,24 @@ function rankHotels(hotelsToRank, placesToEvaluate, currentBudget) {
   return results;
 }
 
-function validateScenario(hotelsToValidate, placesToValidate, currentBudget) {
+function validateScenario(
+  hotelsToValidate,
+  placesToValidate,
+  currentBudget,
+  options = {},
+) {
   const invalid = (errorMessage) => ({
     is_valid: false,
     error_message: errorMessage,
   });
 
-  if (!Array.isArray(hotelsToValidate) || hotelsToValidate.length !== 10) {
+  const isEdgeCase = options.allowEdgeCase === true;
+  const expectedPlaceCount = isEdgeCase ? placesToValidate?.length : 15;
+
+  if (!Array.isArray(hotelsToValidate) || (!isEdgeCase && hotelsToValidate.length !== 10)) {
     return invalid("Scenario must contain exactly 10 hotels.");
   }
-  if (!Array.isArray(placesToValidate) || placesToValidate.length !== 15) {
+  if (!Array.isArray(placesToValidate) || (!isEdgeCase && placesToValidate.length !== 15)) {
     return invalid("Scenario must contain exactly 15 places.");
   }
 
@@ -260,7 +319,7 @@ function validateScenario(hotelsToValidate, placesToValidate, currentBudget) {
     }
     typeCounts[place.type] += 1;
   }
-  if (typeCounts.attraction < 3 || typeCounts.food < 3) {
+  if (!isEdgeCase && (typeCounts.attraction < 3 || typeCounts.food < 3)) {
     return invalid("Scenario must contain at least 3 attractions and 3 food places.");
   }
 
@@ -271,7 +330,7 @@ function validateScenario(hotelsToValidate, placesToValidate, currentBudget) {
     }
     importanceValues.add(place.importance);
   }
-  if (importanceValues.size < 3) {
+  if (!isEdgeCase && importanceValues.size < 3) {
     return invalid("Scenario must contain at least 3 distinct place importance values.");
   }
 
@@ -292,8 +351,8 @@ function validateScenario(hotelsToValidate, placesToValidate, currentBudget) {
     }
 
     const travelPlaceIds = Object.keys(hotel.round_trip_minutes);
-    if (travelPlaceIds.length !== 15) {
-      return invalid(`Hotel "${hotel.id}" must map exactly 15 place IDs.`);
+    if (travelPlaceIds.length !== expectedPlaceCount) {
+      return invalid(`Hotel "${hotel.id}" must map exactly ${expectedPlaceCount} place IDs.`);
     }
     for (const placeId of travelPlaceIds) {
       if (!placeIds.has(placeId)) {
@@ -316,8 +375,18 @@ function validateScenario(hotelsToValidate, placesToValidate, currentBudget) {
   };
 }
 
-function processRankingRequest(hotelsToProcess, placesToProcess, currentBudget) {
-  const validation = validateScenario(hotelsToProcess, placesToProcess, currentBudget);
+function processRankingRequest(
+  hotelsToProcess,
+  placesToProcess,
+  currentBudget,
+  options = {},
+) {
+  const validation = validateScenario(
+    hotelsToProcess,
+    placesToProcess,
+    currentBudget,
+    options,
+  );
 
   if (!validation.is_valid) {
     return {
@@ -352,7 +421,7 @@ function renderImportanceControls() {
     return;
   }
 
-  controls.innerHTML = places.map((place) => `
+  controls.innerHTML = activePlaces.map((place) => `
     <div class="importance-control">
       <label for="importance-${escapeHTML(place.id)}">${escapeHTML(place.name)}</label>
       <output id="importance-value-${escapeHTML(place.id)}" for="importance-${escapeHTML(place.id)}">${place.importance}</output>
@@ -368,6 +437,9 @@ function renderImportanceControls() {
       />
     </div>
   `).join("");
+  controls.querySelectorAll("[data-place-id]").forEach((control) => {
+    control.addEventListener("input", renderUI);
+  });
 }
 
 function createSvgElement(tagName, attributes = {}) {
@@ -389,7 +461,7 @@ function renderMapMarkers() {
   map.innerHTML = "";
   const markerLayer = createSvgElement("g", { class: "marker-layer" });
 
-  hotels.forEach((hotel) => {
+  activeHotels.forEach((hotel) => {
     const marker = createSvgElement("g", {
       class: "map-marker hotel-marker",
       "data-hotel-id": hotel.id,
@@ -413,7 +485,7 @@ function renderMapMarkers() {
     markerLayer.appendChild(marker);
   });
 
-  places.forEach((place) => {
+  activePlaces.forEach((place) => {
     const marker = createSvgElement("g", {
       class: "map-marker place-marker",
       "data-place-id": place.id,
@@ -482,8 +554,10 @@ function renderCalculationDetails(hotel) {
     return;
   }
 
-  const stats = calculateHotelStats(hotel, places, DEFAULT_BUDGET);
-  const rows = places.map((place) => {
+  const budgetInput = document.querySelector("#budget-input");
+  const currentBudget = Number(budgetInput?.value ?? DEFAULT_BUDGET);
+  const stats = calculateHotelStats(hotel, activePlaces, currentBudget);
+  const rows = activePlaces.map((place) => {
     const travelMinutes = hotel.round_trip_minutes[place.id];
     const contribution = calculateContribution(hotel, place);
 
@@ -513,7 +587,7 @@ function renderCalculationDetails(hotel) {
       </table>
     </div>
     <p class="formula">
-      <code>weighted_travel_total = ${places.map((place) => `${place.importance} × ${hotel.round_trip_minutes[place.id]}`).join(" + ")} = ${stats.weighted_travel_total}</code>
+      <code>weighted_travel_total = ${activePlaces.map((place) => `${place.importance} × ${hotel.round_trip_minutes[place.id]}`).join(" + ")} = ${stats.weighted_travel_total}</code>
     </p>
     <p class="formula">
       <code>rounded_tenths = floor((20 × ${stats.weighted_travel_total} + ${stats.importance_total}) / (2 × ${stats.importance_total})) = ${Math.round(stats.weighted_average_minutes * 10)}</code>;
@@ -524,7 +598,7 @@ function renderCalculationDetails(hotel) {
 
 function inspectHotel(hotelId) {
   const map = document.querySelector("#city-map");
-  const hotel = hotels.find((candidate) => candidate.id === hotelId);
+  const hotel = activeHotels.find((candidate) => candidate.id === hotelId);
 
   clearMapInspection();
   if (!inspectionEnabled || !map || !hotel) {
@@ -536,7 +610,7 @@ function inspectHotel(hotelId) {
   hotelMarker?.classList.add("inspected");
   focusHotelCard(hotel.id);
 
-  places.forEach((place) => {
+  activePlaces.forEach((place) => {
     const line = createSvgElement("line", {
       class: "comparison-line",
       x1: hotel.x,
@@ -592,6 +666,68 @@ function renderHotelCard(hotel) {
   `;
 }
 
+function getTimelineLabel(result) {
+  if (result.status === "NO_AFFORDABLE_HOTEL") {
+    return "NO AFFORDABLE HOTEL";
+  }
+
+  const recommended = result.find((hotel) => hotel.is_recommended);
+  return recommended ? recommended.name : "NO AFFORDABLE HOTEL";
+}
+
+function generateTimeline() {
+  const maximumCost = Math.max(...activeHotels.map((hotel) => hotel.stay_cost));
+  const thresholds = [...new Set([
+    0,
+    ...activeHotels.map((hotel) => hotel.stay_cost),
+  ])].sort((valueA, valueB) => valueA - valueB);
+  const segments = [];
+
+  thresholds.forEach((startBudget, index) => {
+    const endBudget = thresholds[index + 1] === undefined
+      ? maximumCost
+      : thresholds[index + 1] - 1;
+    const result = processRankingRequest(
+      activeHotels,
+      activePlaces,
+      startBudget,
+      activeScenarioOptions,
+    );
+    const label = getTimelineLabel(result);
+    const previous = segments[segments.length - 1];
+
+    if (previous && previous.label === label && previous.end + 1 === startBudget) {
+      previous.end = endBudget;
+    } else {
+      segments.push({ start: startBudget, end: endBudget, label });
+    }
+  });
+
+  return segments;
+}
+
+function renderTimeline() {
+  const timeline = document.querySelector("#recommendation-timeline");
+
+  if (!timeline) {
+    return;
+  }
+
+  const segments = generateTimeline();
+  timeline.innerHTML = `
+    <ul class="timeline-list">
+      ${segments.map((segment) => {
+        const range = segment.end === Math.max(...activeHotels.map((hotel) => hotel.stay_cost))
+          ? `$${segment.start.toLocaleString()}+`
+          : `$${segment.start.toLocaleString()} - $${segment.end.toLocaleString()}`;
+        const isRecommendation = segment.label !== "NO AFFORDABLE HOTEL";
+
+        return `<li class="timeline-item${isRecommendation ? " recommendation" : ""}">${range}: ${escapeHTML(segment.label)}</li>`;
+      }).join("")}
+    </ul>
+  `;
+}
+
 function renderUI() {
   const budgetInput = document.querySelector("#budget-input");
   const controls = document.querySelectorAll("[data-place-id]");
@@ -604,7 +740,7 @@ function renderUI() {
   }
 
   controls.forEach((control) => {
-    const place = places.find((candidate) => candidate.id === control.dataset.placeId);
+    const place = activePlaces.find((candidate) => candidate.id === control.dataset.placeId);
     const value = Number(control.value);
 
     if (place && Number.isInteger(value)) {
@@ -618,11 +754,17 @@ function renderUI() {
   });
 
   const currentBudget = Number(budgetInput.value);
-  const rankingResult = processRankingRequest(hotels, places, currentBudget);
+  const rankingResult = processRankingRequest(
+    activeHotels,
+    activePlaces,
+    currentBudget,
+    activeScenarioOptions,
+  );
 
   if (summary) {
-    summary.textContent = `${places.length} places · ${hotels.length} hotels`;
+    summary.textContent = `${activePlaces.length} places · ${activeHotels.length} hotels`;
   }
+  renderTimeline();
 
   if (rankingResult.status === "INVALID_SCENARIO") {
     inspectionEnabled = false;
@@ -657,6 +799,11 @@ function renderUI() {
 function resetScenario() {
   const budgetInput = document.querySelector("#budget-input");
 
+  activePlaces = places;
+  activeHotels = hotels;
+  activeScenarioOptions = {};
+  inspectionEnabled = false;
+
   if (budgetInput) {
     budgetInput.value = String(DEFAULT_BUDGET);
   }
@@ -679,21 +826,36 @@ function resetScenario() {
     }
   });
 
+  renderImportanceControls();
+  renderMapMarkers();
+  renderUI();
+}
+
+function loadEdgeCases() {
+  activePlaces = EDGE_CASE_PLACES;
+  activeHotels = EDGE_CASE_HOTELS;
+  activeScenarioOptions = { allowEdgeCase: true };
+  inspectionEnabled = false;
+
+  const budgetInput = document.querySelector("#budget-input");
+  if (budgetInput) {
+    budgetInput.value = "100";
+  }
+  renderImportanceControls();
+  renderMapMarkers();
   renderUI();
 }
 
 function attachUIListeners() {
   const budgetInput = document.querySelector("#budget-input");
-  const controls = document.querySelectorAll("[data-place-id]");
   const resetButton = document.querySelector("#reset-btn");
+  const edgeCaseButton = document.querySelector("#edge-case-btn");
 
   if (budgetInput) {
     budgetInput.addEventListener("input", renderUI);
   }
-  controls.forEach((control) => {
-    control.addEventListener("input", renderUI);
-  });
   resetButton?.addEventListener("click", resetScenario);
+  edgeCaseButton?.addEventListener("click", loadEdgeCases);
 
   const results = document.querySelector("#hotel-results");
   if (results) {
