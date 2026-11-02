@@ -13,7 +13,7 @@
 3. Selected `DEFAULT_BUDGET = 100000`.
    - **Reason:** This whole-number budget makes the affordability boundary explicit and allows a controlled mix of affordable and over-budget hotels.
    - **File:** `app.js`
-4. Defined exactly 15 deterministic places, including 10 attractions and 5 food locations, with importance values of 2, 3, 4, and 5.
+4. Defined exactly 15 deterministic places, including 9 attractions and 6 food locations, with importance values of 2, 3, 4, and 5.
    - **Reason:** The data meets the required type minimums and uses multiple importance levels while remaining stable on every page load.
    - **File:** `app.js`
 5. Defined exactly 10 deterministic hotels. Every hotel maps every place ID to an integer round-trip travel time from 1 to 600 minutes.

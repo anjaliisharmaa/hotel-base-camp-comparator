@@ -1,5 +1,18 @@
+// a constant variable holding a starting financial limit
 const DEFAULT_BUDGET = 100000;
 
+
+// a list (array) of javascript objects
+// defined 15 places -> 9 attractions and 6 food spots
+/*
+it contains:
+1. id : a unique ID used by code to identify this place
+2. name : the human-readable name of the location
+3. type : the category (e.g., "attraction" vs. "food")
+4. importance : a priority or rating score (from 1 to 5)
+5. x : horizontal coordinate on a map or grid (0 to 100)
+6. y : vertical coordinate on a map or grid (0 to 100)
+*/
 const places = [
   { id: "P_MUSEUM", name: "Civic History Museum", type: "attraction", importance: 5, x: 25, y: 28 },
   { id: "P_GALLERY", name: "Northlight Gallery", type: "attraction", importance: 4, x: 42, y: 18 },
@@ -18,11 +31,28 @@ const places = [
   { id: "P_FESTIVAL", name: "Riverside Festival Grounds", type: "attraction", importance: 5, x: 90, y: 74 },
 ];
 
+
+// a map to ensure we have the of values saved
+// maps every place is to its importance score
+// example : P_MUSEUM -> 5
 const ORIGINAL_IMPORTANCE_MAP = new Map(
   places.map((place) => [place.id, place.importance]),
 );
+
+
+// for invalid budget like '-50', it throws validation error
+// if user ignores the error and clicks on any hotel dot, this guards the backend calculation
 let inspectionEnabled = false;
 
+
+// array for hotels
+/*
+it contains:
+1. id : unique identifiers
+2. name : human readable display name
+3. stay_cost : cost required to stay at hotel
+4. round_trip_minutes : a pre calculated time travel matrux
+*/
 const hotels = [
   {
     id: "H_CITADEL",
