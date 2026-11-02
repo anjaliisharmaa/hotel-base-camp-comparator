@@ -247,19 +247,36 @@ const EDGE_CASE_HOTELS = [
   },
 ];
 
+
+
+// contribution(h, p) = importance(p) × round_trip_minutes(h, p)
 function calculateContribution(hotel, place) {
   return place.importance * hotel.round_trip_minutes[place.id];
 }
 
+
+
+// math core engine
 function calculateHotelStats(hotel, placesToEvaluate, budget) {
+
+  // loop through placesToEvaluate array
+  // sum up importance
+  // this will act as denominator to calculate avg later
   const importanceTotal = placesToEvaluate.reduce(
     (total, place) => total + place.importance,
     0,
   );
+
+  // loop through placesToEvaluate again
+  // use contribution function defined above
+  // sums up all imp * travel time
   const weightedTravelTotal = placesToEvaluate.reduce(
     (total, place) => total + calculateContribution(hotel, place),
     0,
   );
+
+  // strict integer only rounding formula
+  // perfect round half up
   const roundedTenths = Math.floor(
     (20 * weightedTravelTotal + importanceTotal) / (2 * importanceTotal),
   );
@@ -269,7 +286,7 @@ function calculateHotelStats(hotel, placesToEvaluate, budget) {
     weighted_travel_total: weightedTravelTotal,
     remaining_budget: budget - hotel.stay_cost,
     is_affordable: hotel.stay_cost <= budget,
-    weighted_average_minutes: roundedTenths / 10,
+    weighted_average_minutes: roundedTenths / 10, // turns 639 into 63.9
   };
 }
 
