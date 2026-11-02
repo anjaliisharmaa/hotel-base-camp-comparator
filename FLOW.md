@@ -125,3 +125,26 @@ All values are literal deterministic fixtures. No random number generation is us
    - **Reason:** This verifies the fixture still validates, the recommended and over-budget card markup is produced, invalid requests retain the clearing contract, and the ranking engine still recommends `H_RIVERSIDE` at `63.9` minutes.
    - **Result:** All checks passed with no failures.
    - **Files:** `index.html`, `style.css`, `app.js`
+
+## Step 5: The Schematic Map
+
+1. Added static `x` and `y` presentation coordinates to all 15 places and 10 hotels.
+   - **Reason:** The schematic needs deterministic, visually clustered marker positions while keeping geometry completely separate from travel-time and accessibility calculations.
+   - **File:** `app.js`
+2. Added an SVG map panel and legend to the page.
+   - **Reason:** SVG provides a dependency-free surface for 25 markers, 15 comparison lines, and readable link labels without an external map API.
+   - **File:** `index.html`
+3. Styled hotel, attraction, and food markers, map labels, comparison lines, inspected hotels, and responsive map sizing.
+   - **Reason:** The map must distinguish entity types and make the active inspection visually clear.
+   - **File:** `style.css`
+4. Added `renderMapMarkers()`, `clearMapInspection()`, and `inspectHotel(hotelId)`.
+   - **Reason:** Marker placement is based only on static coordinates. Link labels use the authoritative `round_trip_minutes` data and `calculateContribution(hotel, place)`; no pixel or SVG distance is used for calculations.
+   - **Behavior:** Inspection clears prior links and inspected markers, draws exactly 15 hotel-to-place lines, and labels each line with travel minutes and weighted contribution.
+   - **File:** `app.js`
+5. Synchronized hotel cards and map inspection.
+   - **Reason:** Click, hover, and keyboard focus on any hotel card inspect that hotel; successful recalculation automatically inspects the recommended hotel; invalid and no-affordable states clear all map links and inspected markers.
+   - **File:** `app.js`
+6. Validated map data and synchronization integration.
+   - **Reason:** This confirms all 25 coordinates are within the 0-100 SVG viewBox, the scenario remains valid, the recommendation remains `H_RIVERSIDE`, and cards expose hotel IDs for inspection.
+   - **Result:** All checks passed with no failures.
+   - **Files:** `index.html`, `style.css`, `app.js`

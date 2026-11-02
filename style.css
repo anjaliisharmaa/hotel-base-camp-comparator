@@ -62,12 +62,13 @@ h3 {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  grid-template-columns: minmax(260px, 320px) minmax(420px, 1.3fr) minmax(320px, 0.9fr);
   gap: 2rem;
   align-items: start;
 }
 
 .sidebar,
+.map-panel,
 .results-panel {
   border: 1px solid #d0d5dd;
   border-radius: 1rem;
@@ -161,6 +162,125 @@ input[type="range"] {
 .results-panel {
   min-width: 0;
   padding: 1.5rem;
+}
+
+.map-panel {
+  min-width: 0;
+  padding: 1.5rem;
+}
+
+.map-hint {
+  margin: 0;
+  color: #667085;
+  font-size: 0.85rem;
+}
+
+.map-container {
+  position: relative;
+  min-height: 520px;
+  overflow: hidden;
+  border: 1px solid #d0d5dd;
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(rgb(82 99 206 / 5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(82 99 206 / 5%) 1px, transparent 1px),
+    #f8faff;
+  background-size: 10% 10%;
+}
+
+#city-map {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+}
+
+.comparison-line {
+  stroke: #5263ce;
+  stroke-dasharray: 1.5 1;
+  stroke-width: 0.25;
+  opacity: 0.7;
+}
+
+.comparison-label {
+  fill: #344054;
+  font-size: 1.35px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 0.5px;
+  text-anchor: middle;
+}
+
+.map-marker {
+  cursor: pointer;
+}
+
+.map-marker-label {
+  fill: #344054;
+  font-size: 1.75px;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 0.6px;
+}
+
+.hotel-marker-shape {
+  fill: #5263ce;
+  stroke: #fff;
+  stroke-width: 0.7;
+}
+
+.place-marker-shape {
+  stroke: #fff;
+  stroke-width: 0.6;
+}
+
+.place-marker-shape.attraction {
+  fill: #e76f51;
+}
+
+.place-marker-shape.food {
+  fill: #2a9d8f;
+}
+
+.map-marker.inspected .hotel-marker-shape {
+  fill: #d6a72c;
+  stroke: #9a6700;
+  stroke-width: 1;
+}
+
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  color: #667085;
+  font-size: 0.8rem;
+}
+
+.map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-marker {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+}
+
+.hotel-marker {
+  background: #5263ce;
+}
+
+.attraction-marker {
+  background: #e76f51;
+}
+
+.food-marker {
+  background: #2a9d8f;
 }
 
 .results-heading {
@@ -280,6 +400,11 @@ input[type="range"] {
 
   .workspace {
     grid-template-columns: 1fr;
+  }
+
+  .map-container,
+  #city-map {
+    min-height: 420px;
   }
 
   .results-heading {

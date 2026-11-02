@@ -34,6 +34,23 @@
             <div id="importance-controls"></div>
           </div>
         </aside>
+        <section class="map-panel" aria-labelledby="map-title">
+          <div class="results-heading">
+            <div>
+              <p class="eyebrow">Schematic map</p>
+              <h2 id="map-title">City connections</h2>
+            </div>
+            <p class="map-hint">Select a hotel to inspect its travel links.</p>
+          </div>
+          <div id="map-container" class="map-container">
+            <svg id="city-map" viewBox="0 0 100 100" role="img" aria-label="Schematic city map"></svg>
+          </div>
+          <div class="map-legend" aria-label="Map legend">
+            <span><i class="legend-marker hotel-marker"></i>Hotel</span>
+            <span><i class="legend-marker attraction-marker"></i>Attraction</span>
+            <span><i class="legend-marker food-marker"></i>Food</span>
+          </div>
+        </section>
         <section class="results-panel" aria-labelledby="results-title">
           <div class="results-heading">
             <div>

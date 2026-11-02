@@ -1,21 +1,21 @@
 const DEFAULT_BUDGET = 100000;
 
 const places = [
-  { id: "P_MUSEUM", name: "Civic History Museum", type: "attraction", importance: 5 },
-  { id: "P_GALLERY", name: "Northlight Gallery", type: "attraction", importance: 4 },
-  { id: "P_PARK", name: "Founders Park", type: "attraction", importance: 3 },
-  { id: "P_AQUARIUM", name: "Bluewater Aquarium", type: "attraction", importance: 2 },
-  { id: "P_THEATER", name: "Grand Avenue Theater", type: "attraction", importance: 4 },
-  { id: "P_MARKET", name: "Sunrise Market", type: "food", importance: 5 },
-  { id: "P_BAKERY", name: "Lantern Bakery", type: "food", importance: 3 },
-  { id: "P_NOODLES", name: "Canal Noodle House", type: "food", importance: 2 },
-  { id: "P_ROOFTOP", name: "Skyline Rooftop", type: "food", importance: 4 },
-  { id: "P_TAVERN", name: "Old Bell Tavern", type: "food", importance: 3 },
-  { id: "P_STADIUM", name: "Union Stadium", type: "attraction", importance: 5 },
-  { id: "P_LIBRARY", name: "Central Library", type: "attraction", importance: 2 },
-  { id: "P_GARDENS", name: "Glasshouse Gardens", type: "attraction", importance: 4 },
-  { id: "P_COURTYARD", name: "Cedar Courtyard", type: "food", importance: 3 },
-  { id: "P_FESTIVAL", name: "Riverside Festival Grounds", type: "attraction", importance: 5 },
+  { id: "P_MUSEUM", name: "Civic History Museum", type: "attraction", importance: 5, x: 25, y: 28 },
+  { id: "P_GALLERY", name: "Northlight Gallery", type: "attraction", importance: 4, x: 42, y: 18 },
+  { id: "P_PARK", name: "Founders Park", type: "attraction", importance: 3, x: 62, y: 25 },
+  { id: "P_AQUARIUM", name: "Bluewater Aquarium", type: "attraction", importance: 2, x: 78, y: 38 },
+  { id: "P_THEATER", name: "Grand Avenue Theater", type: "attraction", importance: 4, x: 54, y: 45 },
+  { id: "P_MARKET", name: "Sunrise Market", type: "food", importance: 5, x: 23, y: 57 },
+  { id: "P_BAKERY", name: "Lantern Bakery", type: "food", importance: 3, x: 39, y: 68 },
+  { id: "P_NOODLES", name: "Canal Noodle House", type: "food", importance: 2, x: 68, y: 67 },
+  { id: "P_ROOFTOP", name: "Skyline Rooftop", type: "food", importance: 4, x: 82, y: 58 },
+  { id: "P_TAVERN", name: "Old Bell Tavern", type: "food", importance: 3, x: 53, y: 80 },
+  { id: "P_STADIUM", name: "Union Stadium", type: "attraction", importance: 5, x: 12, y: 35 },
+  { id: "P_LIBRARY", name: "Central Library", type: "attraction", importance: 2, x: 17, y: 78 },
+  { id: "P_GARDENS", name: "Glasshouse Gardens", type: "attraction", importance: 4, x: 34, y: 72 },
+  { id: "P_COURTYARD", name: "Cedar Courtyard", type: "food", importance: 3, x: 72, y: 88 },
+  { id: "P_FESTIVAL", name: "Riverside Festival Grounds", type: "attraction", importance: 5, x: 90, y: 74 },
 ];
 
 const hotels = [
@@ -23,6 +23,7 @@ const hotels = [
     id: "H_CITADEL",
     name: "Citadel Grand Hotel",
     stay_cost: 180000,
+    x: 47, y: 50,
     round_trip_minutes: {
       P_MUSEUM: 10, P_GALLERY: 10, P_PARK: 10, P_AQUARIUM: 10, P_THEATER: 10,
       P_MARKET: 10, P_BAKERY: 10, P_NOODLES: 10, P_ROOFTOP: 10, P_TAVERN: 10,
@@ -33,6 +34,7 @@ const hotels = [
     id: "H_RIVERSIDE",
     name: "Riverside House",
     stay_cost: 60000,
+    x: 48, y: 58,
     round_trip_minutes: {
       P_MUSEUM: 60, P_GALLERY: 62, P_PARK: 64, P_AQUARIUM: 66, P_THEATER: 68,
       P_MARKET: 60, P_BAKERY: 62, P_NOODLES: 64, P_ROOFTOP: 66, P_TAVERN: 68,
@@ -43,6 +45,7 @@ const hotels = [
     id: "H_MARKET",
     name: "Market Square Inn",
     stay_cost: 30000,
+    x: 35, y: 52,
     round_trip_minutes: {
       P_MUSEUM: 100, P_GALLERY: 102, P_PARK: 104, P_AQUARIUM: 106, P_THEATER: 108,
       P_MARKET: 100, P_BAKERY: 102, P_NOODLES: 104, P_ROOFTOP: 106, P_TAVERN: 108,
@@ -53,6 +56,7 @@ const hotels = [
     id: "H_GARDEN",
     name: "Garden Court Hotel",
     stay_cost: 75000,
+    x: 58, y: 55,
     round_trip_minutes: {
       P_MUSEUM: 70, P_GALLERY: 72, P_PARK: 74, P_AQUARIUM: 76, P_THEATER: 78,
       P_MARKET: 70, P_BAKERY: 72, P_NOODLES: 74, P_ROOFTOP: 76, P_TAVERN: 78,
@@ -63,6 +67,7 @@ const hotels = [
     id: "H_HARBOR",
     name: "Harbor Lantern Hotel",
     stay_cost: 90000,
+    x: 62, y: 48,
     round_trip_minutes: {
       P_MUSEUM: 80, P_GALLERY: 82, P_PARK: 84, P_AQUARIUM: 86, P_THEATER: 88,
       P_MARKET: 80, P_BAKERY: 82, P_NOODLES: 84, P_ROOFTOP: 86, P_TAVERN: 88,
@@ -73,6 +78,7 @@ const hotels = [
     id: "H_STATION",
     name: "Station Exchange Hotel",
     stay_cost: 100000,
+    x: 44, y: 42,
     round_trip_minutes: {
       P_MUSEUM: 86, P_GALLERY: 88, P_PARK: 90, P_AQUARIUM: 88, P_THEATER: 86,
       P_MARKET: 88, P_BAKERY: 90, P_NOODLES: 88, P_ROOFTOP: 86, P_TAVERN: 88,
@@ -83,6 +89,7 @@ const hotels = [
     id: "H_HILLSIDE",
     name: "Hillside Lodge",
     stay_cost: 125000,
+    x: 24, y: 44,
     round_trip_minutes: {
       P_MUSEUM: 130, P_GALLERY: 132, P_PARK: 134, P_AQUARIUM: 136, P_THEATER: 138,
       P_MARKET: 130, P_BAKERY: 132, P_NOODLES: 134, P_ROOFTOP: 136, P_TAVERN: 138,
@@ -93,6 +100,7 @@ const hotels = [
     id: "H_AIRPORT",
     name: "Airport Meridian",
     stay_cost: 160000,
+    x: 76, y: 46,
     round_trip_minutes: {
       P_MUSEUM: 150, P_GALLERY: 152, P_PARK: 154, P_AQUARIUM: 156, P_THEATER: 158,
       P_MARKET: 150, P_BAKERY: 152, P_NOODLES: 154, P_ROOFTOP: 156, P_TAVERN: 158,
@@ -103,6 +111,7 @@ const hotels = [
     id: "H_UNIVERSITY",
     name: "University Commons",
     stay_cost: 220000,
+    x: 73, y: 33,
     round_trip_minutes: {
       P_MUSEUM: 180, P_GALLERY: 182, P_PARK: 184, P_AQUARIUM: 186, P_THEATER: 188,
       P_MARKET: 180, P_BAKERY: 182, P_NOODLES: 184, P_ROOFTOP: 186, P_TAVERN: 188,
@@ -113,6 +122,7 @@ const hotels = [
     id: "H_OLD_TOWN",
     name: "Old Town Residence",
     stay_cost: 110000,
+    x: 37, y: 38,
     round_trip_minutes: {
       P_MUSEUM: 110, P_GALLERY: 112, P_PARK: 114, P_AQUARIUM: 116, P_THEATER: 118,
       P_MARKET: 110, P_BAKERY: 112, P_NOODLES: 114, P_ROOFTOP: 116, P_TAVERN: 118,
@@ -355,6 +365,115 @@ function renderImportanceControls() {
   `).join("");
 }
 
+function createSvgElement(tagName, attributes = {}) {
+  const element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
+
+  Object.entries(attributes).forEach(([name, value]) => {
+    element.setAttribute(name, String(value));
+  });
+  return element;
+}
+
+function renderMapMarkers() {
+  const map = document.querySelector("#city-map");
+
+  if (!map) {
+    return;
+  }
+
+  map.innerHTML = "";
+  const markerLayer = createSvgElement("g", { class: "marker-layer" });
+
+  hotels.forEach((hotel) => {
+    const marker = createSvgElement("g", {
+      class: "map-marker hotel-marker",
+      "data-hotel-id": hotel.id,
+      transform: `translate(${hotel.x} ${hotel.y})`,
+    });
+    marker.appendChild(createSvgElement("circle", {
+      class: "hotel-marker-shape",
+      r: 2.2,
+    }));
+    const label = createSvgElement("text", {
+      class: "map-marker-label",
+      x: 3,
+      y: 0.7,
+    });
+    label.textContent = hotel.name;
+    marker.appendChild(label);
+    markerLayer.appendChild(marker);
+  });
+
+  places.forEach((place) => {
+    const marker = createSvgElement("g", {
+      class: "map-marker place-marker",
+      "data-place-id": place.id,
+      transform: `translate(${place.x} ${place.y})`,
+    });
+    marker.appendChild(createSvgElement("circle", {
+      class: `place-marker-shape ${place.type}`,
+      r: 1.6,
+    }));
+    const label = createSvgElement("text", {
+      class: "map-marker-label",
+      x: 2.5,
+      y: 0.6,
+    });
+    label.textContent = place.name;
+    marker.appendChild(label);
+    markerLayer.appendChild(marker);
+  });
+
+  map.appendChild(markerLayer);
+}
+
+function clearMapInspection() {
+  const map = document.querySelector("#city-map");
+
+  if (!map) {
+    return;
+  }
+
+  map.querySelector(".comparison-layer")?.remove();
+  map.querySelectorAll(".map-marker.inspected").forEach((marker) => {
+    marker.classList.remove("inspected");
+  });
+}
+
+function inspectHotel(hotelId) {
+  const map = document.querySelector("#city-map");
+  const hotel = hotels.find((candidate) => candidate.id === hotelId);
+
+  clearMapInspection();
+  if (!map || !hotel) {
+    return;
+  }
+
+  const comparisonLayer = createSvgElement("g", { class: "comparison-layer" });
+  const hotelMarker = map.querySelector(`[data-hotel-id="${hotel.id}"]`);
+  hotelMarker?.classList.add("inspected");
+
+  places.forEach((place) => {
+    const line = createSvgElement("line", {
+      class: "comparison-line",
+      x1: hotel.x,
+      y1: hotel.y,
+      x2: place.x,
+      y2: place.y,
+    });
+    const label = createSvgElement("text", {
+      class: "comparison-label",
+      x: (hotel.x + place.x) / 2,
+      y: (hotel.y + place.y) / 2 - 0.8,
+    });
+    label.textContent = `${hotel.round_trip_minutes[place.id]}m · ${calculateContribution(hotel, place)}`;
+    comparisonLayer.appendChild(line);
+    comparisonLayer.appendChild(label);
+  });
+
+  map.insertBefore(comparisonLayer, map.querySelector(".marker-layer"));
+}
+
 function renderHotelCard(hotel) {
   const isOverBudget = hotel.is_over_budget;
   const cardClass = isOverBudget
@@ -374,7 +493,7 @@ function renderHotelCard(hotel) {
     `;
 
   return `
-    <article class="${cardClass}">
+    <article class="${cardClass}" data-hotel-id="${escapeHTML(hotel.id)}" tabindex="0">
       <div class="hotel-card-header">
         <div>
           ${headingLabel}
@@ -422,6 +541,7 @@ function renderUI() {
   }
 
   if (rankingResult.status === "INVALID_SCENARIO") {
+    clearMapInspection();
     errorBanner.hidden = false;
     errorBanner.textContent = rankingResult.error_message;
     results.innerHTML = "";
@@ -432,6 +552,7 @@ function renderUI() {
   errorBanner.textContent = "";
 
   if (rankingResult.status === "NO_AFFORDABLE_HOTEL") {
+    clearMapInspection();
     results.innerHTML = `
       <div class="empty-results">
         <strong>NO AFFORDABLE HOTELS</strong>
@@ -443,6 +564,7 @@ function renderUI() {
   }
 
   results.innerHTML = rankingResult.map(renderHotelCard).join("");
+  inspectHotel(rankingResult[0].id);
 }
 
 function attachUIListeners() {
@@ -455,12 +577,35 @@ function attachUIListeners() {
   controls.forEach((control) => {
     control.addEventListener("input", renderUI);
   });
+
+  const results = document.querySelector("#hotel-results");
+  if (results) {
+    results.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-hotel-id]");
+      if (card) {
+        inspectHotel(card.dataset.hotelId);
+      }
+    });
+    results.addEventListener("mouseover", (event) => {
+      const card = event.target.closest("[data-hotel-id]");
+      if (card) {
+        inspectHotel(card.dataset.hotelId);
+      }
+    });
+    results.addEventListener("focusin", (event) => {
+      const card = event.target.closest("[data-hotel-id]");
+      if (card) {
+        inspectHotel(card.dataset.hotelId);
+      }
+    });
+  }
 }
 
 const budgetInput = document.querySelector("#budget-input");
 if (budgetInput) {
   budgetInput.value = String(DEFAULT_BUDGET);
   renderImportanceControls();
+  renderMapMarkers();
   attachUIListeners();
   renderUI();
 }
