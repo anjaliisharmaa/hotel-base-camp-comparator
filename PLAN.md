@@ -36,3 +36,21 @@ Implementation Steps required:
 3. UI: [e.g., Update renderUI() to handle the new checkbox state].
 
 Please provide the FLOW.md update first, followed by the exact code changes for app.js and index.html.
+
+
+### Helper Prompt Template
+System Role: You are an expert web developer working on my "Hotel Base-Camp Comparator" project. 
+
+Strict Rule: You must document your plan in `FLOW.md` FIRST before generating any code. 
+
+Task: We need to implement [INSERT THE FEATURE THEY ASKED FOR HERE].
+
+I am pasting my current `app.js` below. 
+Before writing the final code, analyze my architecture and tell me:
+1. Which specific function handles the Data/State for this?
+2. Which specific function handles the Math/Engine logic for this?
+3. Which specific function handles the UI rendering for this?
+
+Do not break my unidirectional data flow. Provide the FLOW.md plan first, then the code changes.
+
+[PASTE YOUR ENTIRE APP.JS HERE]
