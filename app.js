@@ -385,6 +385,15 @@ function rankHotels(hotelsToRank, placesToEvaluate, currentBudget) {
   return results;
 }
 
+
+
+// checks that there are exactly 10 hotels and 15 places (except special edge cases)
+// hotel and place id are valid and unique
+// names are not empty
+// places are either attraction or food
+// enough place types and imp levels
+// every hotel has travel time for evry place
+// travel time is in bw 1 and 600
 function validateScenario(
   hotelsToValidate,
   placesToValidate,
@@ -504,6 +513,11 @@ function validateScenario(
   };
 }
 
+
+
+// validates the input scenario
+// rturns an INVALID_SCENARIO result if validation fails
+// if passed, calls the hotel-ranking function
 function processRankingRequest(
   hotelsToProcess,
   placesToProcess,
@@ -534,6 +548,9 @@ function processRankingRequest(
   return rankHotels(hotelsToProcess, placesToProcess, currentBudget);
 }
 
+
+
+// converts characters such as <, >, ", and & into safe HTML entities
 function escapeHTML(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -543,6 +560,8 @@ function escapeHTML(value) {
     .replaceAll("'", "&#039;");
 }
 
+
+// creates a range slider from 1 to 5 for every place
 function renderImportanceControls() {
   const controls = document.querySelector("#importance-controls");
 
@@ -571,6 +590,9 @@ function renderImportanceControls() {
   });
 }
 
+
+
+// creates SVG elements
 function createSvgElement(tagName, attributes = {}) {
   const element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
 
@@ -580,6 +602,11 @@ function createSvgElement(tagName, attributes = {}) {
   return element;
 }
 
+
+
+// adds hotel markers and labels
+// adds place markers and labels
+// allows users to click a hotel marker to inspect it
 function renderMapMarkers() {
   const map = document.querySelector("#city-map");
 
@@ -637,6 +664,9 @@ function renderMapMarkers() {
   map.appendChild(markerLayer);
 }
 
+
+
+// removes map lines, highlights, and calculation details
 function clearMapInspection() {
   const map = document.querySelector("#city-map");
   const results = document.querySelector("#hotel-results");
@@ -661,6 +691,9 @@ function clearMapInspection() {
   }
 }
 
+
+
+// highlights the corresponding hotel result card
 function focusHotelCard(hotelId, shouldScroll = false) {
   const results = document.querySelector("#hotel-results");
   const card = results?.querySelector(`[data-hotel-id="${hotelId}"]`);
@@ -725,6 +758,12 @@ function renderCalculationDetails(hotel) {
   `;
 }
 
+
+
+// highlights the selected hotel
+// draws lines from that hotel to every place
+// displays travel time and weighted contribution on the map
+// shows a detailed calculation table below the map
 function inspectHotel(hotelId) {
   const map = document.querySelector("#city-map");
   const hotel = activeHotels.find((candidate) => candidate.id === hotelId);
@@ -761,6 +800,9 @@ function inspectHotel(hotelId) {
   renderCalculationDetails(hotel);
 }
 
+
+
+// creates the HTML card for each hotel
 function renderHotelCard(hotel) {
   const isOverBudget = hotel.is_over_budget;
   const cardClass = isOverBudget
@@ -795,6 +837,9 @@ function renderHotelCard(hotel) {
   `;
 }
 
+
+
+// tests different budget thresholds based on hotel prices
 function getTimelineLabel(result) {
   if (result.status === "NO_AFFORDABLE_HOTEL") {
     return "NO AFFORDABLE HOTEL";
@@ -857,6 +902,16 @@ function renderTimeline() {
   `;
 }
 
+
+// reads the current budget
+// reads all place importance slider values
+// recalculates hotel rankings
+// updates the place/hotel count summary
+// updates the recommendation timeline
+// shows validation errors when necessary
+// shows an empty-state message when no hotel is affordable
+// renders hotel cards.
+// automatically inspects the top-ranked hotel
 function renderUI() {
   const budgetInput = document.querySelector("#budget-input");
   const controls = document.querySelectorAll("[data-place-id]");
@@ -925,6 +980,12 @@ function renderUI() {
   inspectHotel(rankingResult[0].id);
 }
 
+
+
+// rstores the original hotels and places
+// resets the budget
+// restores original place importance values
+// re-renders the controls, map, and results
 function resetScenario() {
   const budgetInput = document.querySelector("#budget-input");
 
@@ -975,6 +1036,17 @@ function loadEdgeCases() {
   renderUI();
 }
 
+
+
+// connects ----
+/*
+Budget input changes
+Reset button
+Edge-case button
+Hotel card click
+Hotel card hover
+Hotel card keyboard focus
+*/
 function attachUIListeners() {
   const budgetInput = document.querySelector("#budget-input");
   const resetButton = document.querySelector("#reset-btn");
