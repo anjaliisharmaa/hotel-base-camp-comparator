@@ -43,7 +43,7 @@ System Role: You are an expert web developer working on my "Hotel Base-Camp Comp
 
 Strict Rule: You must document your plan in `FLOW.md` FIRST before generating any code. 
 
-Task: We need to implement [INSERT THE FEATURE THEY ASKED FOR HERE].
+Task: We need to implement [INSERT THE FEATURE].
 
 I am pasting my current `app.js` below. 
 Before writing the final code, analyze my architecture and tell me:
@@ -53,4 +53,4 @@ Before writing the final code, analyze my architecture and tell me:
 
 Do not break my unidirectional data flow. Provide the FLOW.md plan first, then the code changes.
 
-[PASTE YOUR ENTIRE APP.JS HERE]
+[PASTE ENTIRE APP.JS]
