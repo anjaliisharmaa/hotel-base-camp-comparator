@@ -22,3 +22,17 @@ Initially, I planned to let the AI build the logic and UI at the same time. I qu
 ### Test Plan & Edge Case Handling
 * **Programmatic Testing:** Used Copilot to write hidden Node.js background scripts that verified exactly 15 places, tested invalid inputs, and checked the mathematical contribution totals.
 * **Visual Edge-Case Evidence:** I built a "Load Tie-Breaker Scenario" button directly into the UI. This injects a targeted 5-hotel dataset to visually prove that the app perfectly handles budget equality, 1-unit over-budget exclusions, and complex identical ties (breaking by cost, then by ASCII ID).
+
+### Prompt Template
+System Role: You are an expert web developer working on my "Hotel Base-Camp Comparator" project. 
+
+Strict Rule: You must document your plan and file changes in `FLOW.md` FIRST before generating any code. Do not break the unidirectional data flow.
+
+Task: We need to implement [INSERT FEATURE HERE, e.g., a checkbox to filter out hotels that cost more than $50,000].
+
+Implementation Steps required:
+1. DATA: [e.g., Add a listener for the new checkbox in index.html].
+2. ENGINE: [e.g., Update rankHotels() to filter out hotels over the limit before sorting].
+3. UI: [e.g., Update renderUI() to handle the new checkbox state].
+
+Please provide the FLOW.md update first, followed by the exact code changes for app.js and index.html.
